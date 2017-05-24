@@ -129,8 +129,9 @@ class IRCHandlingThread(Thread):
                         else:
                             if name not in irc_nicknames_to_ignore:
                                 if slack_channel_to_echo:
-                                    outname = chr(8203).join(name)
-                                    slack.post_message(slack_channel_to_echo, outname + ": " + msg)
+                                    # outname = chr(8203).join(name)
+                                    # slack.post_message(slack_channel_to_echo, outname + ": " + msg)
+                                    slack.post_message(slack_channel_to_echo, name + ": " + msg)
                                     print("irc -> slack - " + name + ": " + msg)
 
 
@@ -177,8 +178,9 @@ class SlackHandlingThread(Thread):
                         else:
                             if name not in slack_channel_to_echo:
                                 if irc_channel_to_echo:
-                                    outname = chr(8203).join(name)
-                                    irc.send(irc_channel_to_echo, outname + ": " + msg)
+                                    # outname = chr(8203).join(name)
+                                    # irc.send(irc_channel_to_echo, outname + ": " + msg)
+                                    irc.send(irc_channel_to_echo, name + ": " + msg)
                                     print("slack -> irc - " + name + ": " + msg)
 
 
