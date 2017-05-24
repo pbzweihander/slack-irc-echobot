@@ -19,4 +19,4 @@ IRC에서 Slack으로, Slack에서 IRC로 그대로 전달해주는 봇
 
 [GNU AGPL 3.0 License](LICENSE.md)
 
-[pbzweihander]: https://github.com/pbzweihander
+[pbzweihander](https://github.com/pbzweihander)
