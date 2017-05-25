@@ -3,16 +3,11 @@ from irc import IRC
 from slack import Slack
 from threading import Thread
 from queue import Queue
+from settings import *
 
-
-BOT_NAME = "echo"
-IRC_SERVER = "irc.uriirc.org"
-IRC_PORT = 16664
-IRC_CHANNEL = "#bacchus"
-# IRC_CHANNEL = "#pbzweihander"
 
 irc = IRC()
-slack = Slack(open('slack.key', 'r').readline().strip(), BOT_NAME)
+slack = Slack(SLACK_TOKEN, BOT_NAME)
 irc_queue = Queue()
 slack_queue = Queue()
 

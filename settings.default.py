@@ -1,0 +1,6 @@
+
+BOT_NAME = ""
+IRC_SERVER = ""
+IRC_PORT = 0
+IRC_CHANNEL = ""
+SLACK_TOKEN = ""
