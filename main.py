@@ -8,7 +8,8 @@ from queue import Queue
 BOT_NAME = "echo"
 IRC_SERVER = "irc.uriirc.org"
 IRC_PORT = 16664
-IRC_CHANNEL = "#bacchus"
+# IRC_CHANNEL = "#bacchus"
+IRC_CHANNEL = "#pbzweihander"
 
 irc = IRC()
 slack = Slack(open('slack.key', 'r').readline().strip(), BOT_NAME)
@@ -121,7 +122,7 @@ class IRCHandlingThread(Thread):
                                 irc.send(chan, "! Ignore " + n)
                                 print("IRC Ignore Set : " + n)
                         elif str.startswith(msg, '?unsetignore'):
-                            for n in str.split(msg, '?setignore')[1].strip().split():
+                            for n in str.split(msg, '?unsetignore')[1].strip().split():
                                 if n in irc_channel_to_echo:
                                     irc_nicknames_to_ignore.remove(n)
                                     irc.send(chan, "! Do not ignore " + n)
@@ -170,13 +171,13 @@ class SlackHandlingThread(Thread):
                                 slack.post_message(chan, "! Ignore " + n)
                                 print("Slack Ignore Set : " + n)
                         elif str.startswith(msg, '?unsetignore'):
-                            for n in str.split(msg, '?setignore')[1].strip().split():
+                            for n in str.split(msg, '?unsetignore')[1].strip().split():
                                 if n in slack_nicknames_to_ignore:
                                     slack_nicknames_to_ignore.remove(n)
                                     slack.post_message(chan, "! Do not ignore " + n)
                                     print("Slack Ignore Unset : " + n)
                         else:
-                            if name not in slack_channel_to_echo:
+                            if name not in slack_nicknames_to_ignore:
                                 if irc_channel_to_echo:
                                     # outname = chr(8203).join(name)
                                     # irc.send(irc_channel_to_echo, outname + ": " + msg)
