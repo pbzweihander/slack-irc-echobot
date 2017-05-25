@@ -29,12 +29,8 @@ class IRCReadingThread(Thread):
 
     def run(self):
         print("IRC Reading Thread run")
-        while True:
-            if self.__suspend:
-                print("IRC Reading Thread Suspending")
-                break
+        while not self.__suspend:
             lines = irc.get_text()
-
             for text in lines:
                 if not text:
                     continue
@@ -50,6 +46,7 @@ class IRCReadingThread(Thread):
 
                     if "#" in chan:
                         irc_queue.put((chan, sender, msg))
+        print("IRC Reading Thread Suspended")
 
 
 class SlackReadingThread(Thread):
@@ -64,22 +61,22 @@ class SlackReadingThread(Thread):
 
     def run(self):
         print("Slack Reading Thread run")
-        while True:
-            if self.__suspend:
-                print("Slack Reading Thread Suspending")
-                break
+        while not self.__suspend:
             d = slack.read()
-            if d and d.get('user') != slack.id:
-                chan = d.get('channel')
-                msg = d.get('text')
+            if d and d.get('subtype') != "bot_message" and d.get('user') != slack.id:
                 userid = d.get('user')
                 username = [u.get('name') for u in slack.users if u.get('id') == userid]
                 if not username:
                     slack.refresh_users()
                     username = [u.get('name') for u in slack.users if u.get('id') == userid]
-                username = username[0]
-
+                if username:
+                    username = username[0]
+                else:
+                    username = "?"
+                chan = d.get('channel')
+                msg = d.get('text')
                 slack_queue.put((chan, username, msg))
+        print("Slack Reading Thread Suspended")
 
 
 class IRCHandlingThread(Thread):
@@ -95,10 +92,7 @@ class IRCHandlingThread(Thread):
     def run(self):
         global irc_channel_to_echo, irc_nicknames_to_ignore
         print("IRC Handling Thread run")
-        while True:
-            if self.__suspend:
-                print("IRC Handling Thread Suspending")
-                break
+        while not self.__suspend:
             if not irc_queue.empty():
                 t = irc_queue.get()
                 chan = t[0]
@@ -127,8 +121,10 @@ class IRCHandlingThread(Thread):
                                 if slack_channel_to_echo:
                                     # outname = chr(8203).join(name)
                                     # slack.post_message(slack_channel_to_echo, outname + ": " + msg)
-                                    slack.post_message(slack_channel_to_echo, name + ": " + msg)
+                                    # slack.post_message(slack_channel_to_echo, name + ": " + msg)
+                                    slack.post_message(slack_channel_to_echo, msg, False, name)
                                     print("irc -> slack - " + name + ": " + msg)
+        print("IRC Handling Thread Suspended")
 
 
 class SlackHandlingThread(Thread):
@@ -144,10 +140,7 @@ class SlackHandlingThread(Thread):
     def run(self):
         global slack_channel_to_echo, slack_nicknames_to_ignore
         print("Slack Handling Thread run")
-        while True:
-            if self.__suspend:
-                print("Slack Handling Thread Suspending")
-                break
+        while not self.__suspend:
             if not slack_queue.empty():
                 t = slack_queue.get()
                 chan = t[0]
@@ -178,6 +171,7 @@ class SlackHandlingThread(Thread):
                                     # irc.send(irc_channel_to_echo, outname + ": " + msg)
                                     irc.send(irc_channel_to_echo, name + ": " + msg)
                                     print("slack -> irc - " + name + ": " + msg)
+        print("Slack Handling Thread Suspended")
 
 
 def main():
