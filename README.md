@@ -2,6 +2,20 @@
 
 IRC에서 Slack으로, Slack에서 IRC로 그대로 전달해주는 봇
 
+### Setting
+
+`settings.default.py` 파일을 `settings.py`로 복사 후 수정
+
+- BOT_NAME : 봇의 닉네임
+- IRC_SERVER : IRC 서버의 주소
+- IRC_PORT : IRC 서버의 포트
+- IRC_CHANNEL : 처음으로 접속할 IRC 채널 (echo할 채널은 INVITE 후 아래 명령어로 설정)
+- SLACK_TOKEN : Slack Bot 토큰
+
+### Usage in IRC and Slack
+
+IRC와 Slack 안에서의 명령어
+
 ```
 # 현재 채널을 echo할 채널로 설정
 ?setechohere
