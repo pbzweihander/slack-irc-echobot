@@ -51,9 +51,9 @@ class Slack:
                     return o
         return {}
 
-    def post_message(self, chan: str, msg: str):
+    def post_message(self, chan: str, msg: str, as_user=True, name=""):
         if self.connected:
-            self.client.api_call('chat.postMessage', channel=chan, text=msg, as_user=True)
+            self.client.api_call('chat.postMessage', channel=chan, text=msg, as_user=as_user, username=name)
 
     def read(self) -> dict:
         if self.connected:
