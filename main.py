@@ -65,16 +65,15 @@ class SlackReadingThread(Thread):
             d = slack.read()
             if d and d.get('subtype') != "bot_message" and d.get('user') != slack.id:
                 userid = d.get('user')
-                username = [u.get('name') for u in slack.users if u.get('id') == userid]
+                username = slack.users.get(userid)
                 if not username:
                     slack.refresh_users()
-                    username = [u.get('name') for u in slack.users if u.get('id') == userid]
-                if username:
-                    username = username[0]
-                else:
-                    username = "?"
+                    username = slack.users.get(userid) or "?"
                 chan = d.get('channel')
                 msg = d.get('text')
+                for id in slack.users:
+                    msg = str.replace(msg, '<@' + id + '>', '<@' + slack.users[id] + '>')
+                msg = str.replace(msg, '&lt;', '<').replace('&gt;', '>')
                 slack_queue.put((chan, username, msg))
         print("Slack Reading Thread Suspended")
 
