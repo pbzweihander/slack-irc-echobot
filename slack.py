@@ -22,7 +22,7 @@ class Slack:
     name = ""
     id = ""
     connected = False
-    users = []
+    users = dict()
 
     def __init__(self, token: str, name: str):
         self.client = SlackClient(token)
@@ -37,7 +37,8 @@ class Slack:
                     break
 
     def refresh_users(self):
-        self.users = self.client.api_call("users.list").get('members')
+        for u in self.client.api_call("users.list").get('members'):
+            self.users[u.get('id')] = u.get('name')
 
     def connect(self) -> bool:
         self.connected = self.client.rtm_connect()
