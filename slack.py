@@ -28,13 +28,11 @@ class Slack:
         self.client = SlackClient(token)
         self.name = name
 
-        api_call = self.client.api_call("users.list")
-        if api_call.get('ok'):
-            self.users = api_call.get('members')
-            for user in self.users:
-                if 'name' in user and user.get('name') == self.name:
-                    self.id = user.get('id')
-                    break
+        self.refresh_users()
+        for user in self.users:
+            if self.users[user] == self.name:
+                self.id = user
+                break
 
     def refresh_users(self):
         for u in self.client.api_call("users.list").get('members'):
