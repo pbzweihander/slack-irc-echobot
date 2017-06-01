@@ -9,8 +9,9 @@ IRC에서 Slack으로, Slack에서 IRC로 그대로 전달해주는 봇
 - BOT_NAME : 봇의 닉네임
 - IRC_SERVER : IRC 서버의 주소
 - IRC_PORT : IRC 서버의 포트
-- IRC_CHANNEL : 처음으로 접속할 IRC 채널 (echo할 채널은 INVITE 후 아래 명령어로 설정)
+- IRC_CHANNEL : IRC 서버의 채널 (# 없이)
 - SLACK_TOKEN : Slack Bot 토큰
+- SLACK_CHANNEL : Slack 서버의 채널 (# 없이)
 
 ### Usage in IRC and Slack
 
