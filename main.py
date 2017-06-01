@@ -87,17 +87,6 @@ def main():
     irc_thread.start()
     slack_thread.start()
 
-    while True:
-        try:
-            pass
-        except KeyboardInterrupt:
-            break
-
-    print("Suspending All Threads...")
-
-    irc_thread.suspend()
-    slack_thread.suspend()
-
 
 if __name__ == '__main__':
     main()
