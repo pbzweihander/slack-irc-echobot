@@ -23,6 +23,7 @@ class Slack:
     id = ""
     connected = False
     users = dict()
+    channels = dict()
 
     def __init__(self, token: str, name: str):
         self.client = SlackClient(token)
@@ -33,27 +34,24 @@ class Slack:
             if self.users[user] == self.name:
                 self.id = user
                 break
+        self.refresh_channels()
 
     def refresh_users(self):
         for u in self.client.api_call("users.list").get('members'):
             self.users[u.get('id')] = u.get('name')
 
+    def refresh_channels(self):
+        for u in self.client.api_call("channels.list").get('channels'):
+            self.channels[u.get('id')] = u.get('name')
+
     def connect(self) -> bool:
         self.connected = self.client.rtm_connect()
         return self.connected
-
-    @staticmethod
-    def parse_slack_output(output: list) -> dict:
-        if output and len(output) > 0:
-            for o in output:
-                if o and 'text' in o:
-                    return o
-        return {}
 
     def post_message(self, chan: str, msg: str, as_user=True, name=""):
         if self.connected:
             self.client.api_call('chat.postMessage', channel=chan, text=msg, as_user=as_user, username=name)
 
-    def read(self) -> dict:
+    def read(self) -> list:
         if self.connected:
-            return self.parse_slack_output(self.client.rtm_read())
+            return self.client.rtm_read()
