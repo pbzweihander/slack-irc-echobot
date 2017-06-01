@@ -3,6 +3,7 @@ from irc import IRC
 from slack import Slack
 from threading import Thread
 from settings import *
+import time
 
 
 irc = IRC()
@@ -38,6 +39,7 @@ class IRCThread(Thread):
                         username = text[1:text.find('!')]
                         slack.post_message('#' + SLACK_CHANNEL, msg, False, username)
                         print("irc -> slack - " + username + ": " + msg)
+            time.sleep(0.01)
         print("IRC Reading Thread Suspended")
 
 
@@ -69,6 +71,7 @@ class SlackThread(Thread):
                         msg = str.replace(msg, '&lt;', '<').replace('&gt;', '>')
                         irc.send(IRC_CHANNEL, username + ": " + msg)
                         print("slack -> irc - " + username + ": " + msg)
+            time.sleep(0.01)
         print("Slack Reading Thread Suspended")
 
 
