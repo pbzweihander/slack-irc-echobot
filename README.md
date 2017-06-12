@@ -28,7 +28,9 @@ IRC와 Slack 안에서의 명령어
 
 ### Requirements
 
-- slackclient
+- requests
+- slacker
+- websocket-client
 
 --------
 
