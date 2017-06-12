@@ -1,4 +1,4 @@
-# Name: slack.py
+# Name: slack_wrapper.py
 # Author: pbzweihander
 # Email: sd852456@naver.com
 #
@@ -14,19 +14,25 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
 
-from slackclient import SlackClient
+import slacker
+import websocket
+import time
 
 
 class Slack:
     client = None
+    socket = None
+    rtm_endpoint = ""
     name = ""
     id = ""
-    connected = False
     users = dict()
     channels = dict()
 
     def __init__(self, token: str, name: str):
-        self.client = SlackClient(token)
+        self.client = slacker.Slacker(token)
+        res = self.client.rtm.start()
+        self.rtm_endpoint = res.body['url']
+        self.connect_socket()
         self.name = name
 
         self.refresh_users()
@@ -36,22 +42,29 @@ class Slack:
                 break
         self.refresh_channels()
 
+    def connect_socket(self):
+        self.socket = websocket.create_connection(self.rtm_endpoint)
+
     def refresh_users(self):
-        for u in self.client.api_call("users.list").get('members'):
+        for u in self.client.users.list().body['members']:
             self.users[u.get('id')] = u.get('name')
 
     def refresh_channels(self):
-        for u in self.client.api_call("channels.list").get('channels'):
+        for u in self.client.channels.list().body['channels']:
             self.channels[u.get('id')] = u.get('name')
 
-    def connect(self) -> bool:
-        self.connected = self.client.rtm_connect()
-        return self.connected
-
     def post_message(self, chan: str, msg: str, as_user=True, name=""):
-        if self.connected:
-            self.client.api_call('chat.postMessage', channel=chan, text=msg, as_user=as_user, username=name)
+        self.client.chat.post_message(channel=chan, text=msg, as_user=as_user, username=name)
 
-    def read(self) -> list:
-        if self.connected:
-            return self.client.rtm_read()
+    def post_formatted_message(self, chan: str, body: list, as_user=True, name=""):
+        self.client.chat.post_message(channel=chan, text=None, attachments=body, as_user=as_user, username=name)
+
+    def read(self) -> str:
+        try:
+            text = self.socket.recv()
+        except websocket.WebSocketConnectionClosedException:
+            print('connection error, reconnecting...')
+            time.sleep(1)
+            self.connect_socket()
+            return self.read()
+        return text
