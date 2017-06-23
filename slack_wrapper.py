@@ -43,7 +43,11 @@ class Slack:
         self.refresh_channels()
 
     def connect_socket(self):
-        self.socket = websocket.create_connection(self.rtm_endpoint)
+        try:
+            self.socket = websocket.create_connection(self.rtm_endpoint)
+        except:
+            time.sleep(1)
+            self.connect_socket()
 
     def refresh_users(self):
         for u in self.client.users.list().body['members']:
