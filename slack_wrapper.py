@@ -22,7 +22,6 @@ import time
 class Slack:
     client = None
     socket = None
-    rtm_endpoint = ""
     name = ""
     id = ""
     users = dict()
@@ -30,8 +29,6 @@ class Slack:
 
     def __init__(self, token: str, name: str):
         self.client = slacker.Slacker(token)
-        res = self.client.rtm.start()
-        self.rtm_endpoint = res.body['url']
         self.connect_socket()
         self.name = name
 
@@ -44,7 +41,9 @@ class Slack:
 
     def connect_socket(self):
         try:
-            self.socket = websocket.create_connection(self.rtm_endpoint)
+            res = self.client.rtm.start()
+            rtm_endpoint = res.body['url']
+            self.socket = websocket.create_connection(rtm_endpoint)
         except:
             time.sleep(1)
             self.connect_socket()
